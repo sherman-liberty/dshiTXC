@@ -1,5 +1,7 @@
 # LCC Sample App
-
+Refer to this Salesforce documentation: https://developer.salesforce.com/blogs/2018/04/lightning-container-component-building-components-with-react-angular-and-other-libraries.html
+Refer to Example 1.
+Refer to this Github repo: https://github.com/ccoenraets/lightning-container-component-samples
 
 ## Installation Instructions
 
@@ -10,9 +12,9 @@ Make sure you have the latest version of the Salesforce DX CLI before proceeding
     sfdx force:auth:web:login -d -a *your_hub_org*
     ```
 
-1. Clone the lcc-samples repository:
+1. Clone the lcc-samples repository (note the url below may be differnt than the Salesforce documentation URL above, the documentation was out of date):
     ```
-    git clone https://github.com/ccoenraets/lcc-samples
+    git clone https://github.com/ccoenraets/lightning-container-component-samples
     cd lcc-samples
     ```
 
@@ -38,6 +40,30 @@ Make sure you have the latest version of the Salesforce DX CLI before proceeding
 
 1. In App Launcher, select the **LCC Samples** app.
 
+## Create your own JavaScript App
+
+1. Create a new folder in the js-apps folder, name it after your JS component.
+    1. Create "src" folder. Create the JS component's JavaScript file to this folder, name it "index.js".
+    1. Make sure you are in the application root folder and type the following command:
+        ``` npm install lightning-container --save
+    1. In your JavaScript code, import the lightning-container module as follows:
+        ``` import LCC from 'lightning-container';
+    1. Create the "package.json" and "webpack.config.js" in your app folder. Use the lcc-sample-messaging app as a reference for these files, change the name and paths as necessary.
+    1. Build your application using a build tool like webpack or rollup (see examples below).
+        1. Install the app dependencies. Make sure you are in the application root folder and type the following command:
+            ``` npm install
+        1. Build the app. Make sure you are in the application root folder and type the following command:
+            ``` npm run build
+    1. Upload your JavaScript application as a static resource. Push your changes to your scratch org:
+        ``` sfdx force:source:push
+    1. Create a Lightning component that wraps your JavaScript application using the lightning:container component. 
+        ```<aura:component>   
+            <lightning:container src="{!$Resource.my_js_app + '/index.html'}"
+                    onmessage="{!c.handleMessage}"
+                    onerror="{!c.handleError}"/>
+        </aura:component>```
+
+1. 
 
 ## Building JavaScript Apps
 
