@@ -11,11 +11,18 @@ window.addEventListener('load', (event) => {
 
 // Register for messages sent by hosting component
 LCC.addMessageHandler(function(message) {
-    console.log('add msg handler');
+	console.log('add msg handler');
+
+	console.log('msg', message);
+	let myobj = message.value;
+	console.log('myobj', myobj);
+	console.log('myobj.heart', myobj.heart);
+
     document.getElementById('messageFromLC').value = message.value;
-    // {"dob":"1950-03-08T05:00:00.000Z","gender":"M"}
+	// {"dob":"1950-03-08T05:00:00.000Z","gender":"M"}
+	// TODO parse the message to create the startObject from the vitals in the message
     let startObject = new Object();
-    let dob = '3/8/1950';
+    let dob = '3/8/1952';
     let dobDate = new Date(dob);
     startObject['dob'] = dobDate;
     startObject['gender'] = 'M';

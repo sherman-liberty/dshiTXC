@@ -1,4 +1,4 @@
-<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" controller="TXCController">
 
     <aura:attribute name="messageToJSApp" type="String" />
     <aura:attribute name="messageFromJSApp" type="String" />
@@ -7,8 +7,8 @@
         <lightning:textarea value="{!v.messageToJSApp}" label="Message to JS app:" />
         <lightning:button label="Send to JS App" onclick="{!c.sendToJSApp}" />
         <lightning:textarea value="{!v.messageFromJSApp}" label="Message from JS app:"></lightning:textarea>
-        <lightning:container aura:id="jsApp" src="{!$Resource.dshi_txc + '/index.html'}" 
-            onmessage="{!c.handleMessage}" 
+        <lightning:container aura:id="jsApp" src="{!$Resource.dshi_txc + '/index.html'}"
+            onmessage="{!c.handleMessage}"
             onerror="{!c.handleError}"
             class="lcc"
             />
