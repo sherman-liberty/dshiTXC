@@ -11,37 +11,42 @@ window.addEventListener('load', (event) => {
 
 // Register for messages sent by hosting component
 LCC.addMessageHandler(function(message) {
-	console.log('add msg handler');
 
-	console.log('msg', message);
-	let myobj = message.value;
-	console.log('myobj', myobj);
-	console.log('myobj.heart', myobj.heart);
+	console.log('addMessageHandler!', message);
+	let triObj = message.value;
+	console.log('triObj', triObj);
 
-    document.getElementById('messageFromLC').value = message.value;
+    // document.getElementById('messageFromLC').value = message.value;
 	// {"dob":"1950-03-08T05:00:00.000Z","gender":"M"}
 	// TODO parse the message to create the startObject from the vitals in the message
-    let startObject = new Object();
-    let dob = '3/8/1952';
-    let dobDate = new Date(dob);
-    startObject['dob'] = dobDate;
-    startObject['gender'] = 'M';
+	let genderVal = (triObj.gender == 'Male') ? 'M' : (triObj.gender == 'Female') ? 'F' : undefined;
 
-    // let startObject = JSON.parse(message.value);
+	let startObject = new Object();
+	startObject['gender'] = genderVal;
+	startObject['dob'] = new Date(triObj.date_of_Birth);
+	startObject['height'] = triObj.height;
+	startObject['weight'] = triObj.weight;
+	startObject['systolicBloodPressure'] = triObj.systolic_Blood_Pressure;
+	startObject['diastolicBloodPressure'] = triObj.diastolic_Blood_Pressure;
+	startObject['temperature'] = triObj.temperature;
+	startObject['serumGlucose'] = triObj.serum_Glucose;
+	startObject['respiratoryRate'] = triObj.respiratory_Rate;
+	startObject['o2'] = triObj.pulse_Oximetry;
+	startObject['pulse'] = triObj.pulse;
+
     let x = document.getElementById("txc");
-    console.log('x: '+x);
     console.log('startObject: '+JSON.stringify(startObject));
     x.start(startObject);
 });
 
-function send() {
-    console.log('send function');
-    var msg = document.getElementById('messageToLC').value;
-    // Send message to hosting component
-    LCC.sendMessage(msg);
-}
+// function send() {
+//     console.log('send function');
+//     var msg = document.getElementById('messageToLC').value;
+//     // Send message to hosting component
+//     LCC.sendMessage(msg);
+// }
 
-document.getElementById("sendBtn").addEventListener("click", send);
+// document.getElementById("sendBtn").addEventListener("click", send);
 
 document.getElementById("txc").addEventListener("complete", function(event) {
     let dispositionObject = JSON.stringify(event.detail);
@@ -2798,6 +2803,7 @@ class dshiTXC extends HTMLElement {
 		alert('library is not implemented yet: ' + event.currentTarget.topic);
 	}
 	tXeOnError(rsp) {
+		console.log('alert error', 'Error: ' + JSON.stringify(rsp, null, 2));
 		alert('Error: ' + JSON.stringify(rsp, null, 2));
 	}
 	onDateKeypress(e) {

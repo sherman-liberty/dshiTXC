@@ -1,9 +1,33 @@
 ({
-    sendToJSApp: function (component, event, helper) {
+    // onRender: function(component) {
 
-        var msgValue;
-        var message;
+    //     console.log('recordId',component.get("v.recordId"));
+    //     var action = component.get("c.getTriage");
+    //     action.setParams({ "recordId": component.get("v.recordId") });
 
+    //     action.setCallback(this, function(response){
+    //         var state = response.getState();
+    //         console.log('callback state', state);
+    //         if (state === "SUCCESS") {
+
+    //             var message = {
+    //                 name: "General",
+    //                 value: response.getReturnValue()
+    //             };
+
+    //             console.log('message END', message);
+    //             // component.set("v.showTXC", true);
+    //             component.find("jsApp").message(message);
+    //         }
+    //     });
+    //     $A.enqueueAction(action);
+
+    // },
+
+    // sendToJSApp
+    callChildMethod: function (component, event, helper) {
+
+        console.log('recordId',component.get("v.recordId"));
         var action = component.get("c.getTriage");
         action.setParams({ "recordId": component.get("v.recordId") });
 
@@ -11,28 +35,34 @@
             var state = response.getState();
             console.log('callback state', state);
             if (state === "SUCCESS") {
-                console.log('respnse.getReturnValue',response.getReturnValue());
-                msgValue = response.getReturnValue()
-                // value: component.get("v.messageToJSApp")
-                message = {
-                    name: "General",
-                    value: msgValue
-                };
-                console.log('message',message);
 
-                console.log('mgsValue END',msgValue);
+                var message = {
+                    name: "General",
+                    value: response.getReturnValue()
+                };
+
                 console.log('message END', message);
+                // component.set("v.showTXC", true);
                 component.find("jsApp").message(message);
             }
         });
         $A.enqueueAction(action);
-
-
     },
 
     handleMessage: function (component, event, helper) {
+        // VERIFY message is the "TXC complete" event
+
+        // set boolean attribute to true/false
+        //Get the event using registerEvent name.
+       
         var message = event.getParams();
+        console.log('message.payload',message.payload);
         component.set('v.messageFromJSApp', message.payload);
+
+        var cmpEvent = component.getEvent("cmpEvent");
+        cmpEvent.setParams({"message" : "Triage process complete."});
+        cmpEvent.fire();
+        console.log('cmpEvent fired maybe', cmpEvent);
     },
 
     handleError: function (component, event, helper) {
