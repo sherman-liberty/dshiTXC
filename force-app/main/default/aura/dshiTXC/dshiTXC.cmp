@@ -1,33 +1,18 @@
 <aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="TXCController">
 
+    <aura:attribute name="showModal" type="boolean" default="false" />
+    <aura:attribute name="isSpinning" type="Boolean" />
+    <aura:attribute name="triageRecord" type="Object" />
+    <aura:attribute name="lccSrc" type="String" />
 
-    <!-- <aura:handler name="render" value="{!this}" action="{!c.onRender}" /> -->
-    <aura:method name="callChild" action="{!c.callChildMethod}" />
-    <aura:registerEvent name="cmpEvent" type="c:txcEvent" />
+    <aura:if isTrue="{!v.isSpinning}">
+        <lightning:spinner variant="brand" size="medium" />
+    </aura:if>
 
-    <!-- <aura:attribute name="messageToJSApp" type="String" /> -->
-
-    <aura:attribute name="messageFromJSApp" type="String" />
-    <!-- <aura:attribute name="txcComplete" type="Boolean" default="false" /> -->
-    <!-- <aura:attribute name="showTXC" type="Boolean" default="false" /> -->
-
-    <!-- sendToJSApp -->
-    <lightning:button label="Start Triage" onclick="{!c.callChildMethod}" />
-
-
-    <!-- <lightning:card title="Triage" class="lcc">
-        <aura:set attribute="actions">
-            <lightning:button label="Start Triage" onclick="{!c.sendToJSApp}" />
-        </aura:set>
-        <p class="slds-p-horizontal_small">
-            Click 'Start Triage' to begin the Triage process.
-        </p> -->
-        <!-- <lightning:textarea value="{!v.messageFromJSApp}" label="Message from JS app:"></lightning:textarea> -->
-
-        <lightning:container aura:id="jsApp" src="{!$Resource.dshi_txc + '/index.html'}"
-            onmessage="{!c.handleMessage}"
-            onerror="{!c.handleError}"
-            class="lcc"
-        />
-    <!-- </lightning:card> -->
+    <!-- using lightning:container component in Aura, not yet supported in LWC -->
+    <lightning:container aura:id="jsApp" src="{!v.lccSrc}"
+        onmessage="{!c.handleMessage}"
+        onerror="{!c.handleError}"
+        class="lcc"
+    />
 </aura:component>

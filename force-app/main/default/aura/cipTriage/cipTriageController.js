@@ -1,23 +1,18 @@
 ({
-    HideMe: function(component, event, helper) {
-        component.set("v.ShowModule", false);
+    doInit: function(component, event, helper) {
+        let lccStaticResName = component.get("v.lccStaticResName");
+        let lccStaticResPath = component.get("v.lccStaticResPath");
+        let lccSrc = $A.get('$Resource.'+lccStaticResName) + lccStaticResPath;
+        component.set("v.lccSrc", lccSrc);
     },
 
-    callChild: function(component, event, helper) {
-        component.set("v.ShowModule", true);
-
-        var childComp = component.find('childComp');
-        childComp.callChild();
+    startTriage: function(component, event, helper) {
+        component.set("v.showModal", true);
+        component.set("v.isSpinning", true);
     },
 
-    handleComponentEvent : function(cmp, event) {
-        console.log('handleComponentEvent FIRING');
-        var message = event.getParam("message");
-        console.log('handleComponentEvent message',message);
-        // set the handler attributes based on event data
-        cmp.set("v.messageFromEvent", message);
-
-        // close module after TXC complete
-        cmp.set("v.ShowModule", false);
-    }
+    hideMe: function(component, event, helper) {
+        // forcing reload to prevent TXC Component start issues.
+        window.location.reload();
+    },
 })

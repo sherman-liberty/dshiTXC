@@ -1,68 +1,49 @@
 ({
-    // onRender: function(component) {
-
-    //     console.log('recordId',component.get("v.recordId"));
-    //     var action = component.get("c.getTriage");
-    //     action.setParams({ "recordId": component.get("v.recordId") });
-
-    //     action.setCallback(this, function(response){
-    //         var state = response.getState();
-    //         console.log('callback state', state);
-    //         if (state === "SUCCESS") {
-
-    //             var message = {
-    //                 name: "General",
-    //                 value: response.getReturnValue()
-    //             };
-
-    //             console.log('message END', message);
-    //             // component.set("v.showTXC", true);
-    //             component.find("jsApp").message(message);
-    //         }
-    //     });
-    //     $A.enqueueAction(action);
-
-    // },
-
-    // sendToJSApp
-    callChildMethod: function (component, event, helper) {
-
-        console.log('recordId',component.get("v.recordId"));
-        var action = component.get("c.getTriage");
-        action.setParams({ "recordId": component.get("v.recordId") });
-
-        action.setCallback(this, function(response){
-            var state = response.getState();
-            console.log('callback state', state);
-            if (state === "SUCCESS") {
-
-                var message = {
-                    name: "General",
-                    value: response.getReturnValue()
-                };
-
-                console.log('message END', message);
-                // component.set("v.showTXC", true);
-                component.find("jsApp").message(message);
-            }
-        });
-        $A.enqueueAction(action);
-    },
 
     handleMessage: function (component, event, helper) {
-        // VERIFY message is the "TXC complete" event
 
-        // set boolean attribute to true/false
-        //Get the event using registerEvent name.
-       
         var message = event.getParams();
-        console.log('message.payload',message.payload);
-        component.set('v.messageFromJSApp', message.payload);
+        var messagePayload = message.payload;
+        var messagePayloadName = message.payload.name;
+        var messagePayloadValue = message.payload.value;
 
-        var cmpEvent = component.getEvent("cmpEvent");
-        cmpEvent.setParams({"message" : "Triage process complete."});
-        cmpEvent.fire();
-        console.log('cmpEvent fired maybe', cmpEvent);
+        if (messagePayloadName == 'startIt') {
+
+            // get Triage record
+            var action = component.get("c.getVitalsObj");
+            action.setParams({ "tri": component.get("v.triageRecord") });
+            action.setCallback(this, function(response) {
+                var state = response.getState();
+                if (component.isValid() && response !== null && response.getState() == 'SUCCESS') {
+                    var message = {
+                        name: "Vitals",
+                        value: response.getReturnValue()
+                    };
+                    component.find("jsApp").message(message);
+                }
+            });
+            $A.enqueueAction(action);
+
+            // turn off spinner
+            component.set("v.isSpinning", false);
+        }
+
+        else if (messagePayloadName == 'completeIt') {
+
+            // update Triage record Status
+            var action2 = component.get("c.updateTriageRecord");
+            action2.setParams({ "triageRecord": component.get("v.triageRecord"), "note": messagePayloadValue.triageNote });
+            action2.setCallback(this, function(response) {
+                console.log('response!',response);
+                if (component.isValid() && response !== null && response.getState() == 'SUCCESS') {
+                    component.set('v.showModal', false);
+                }
+            });
+            $A.enqueueAction(action2);
+
+            // reload window to avoid long callback wait
+            window.location.reload();
+        }
     },
 
     handleError: function (component, event, helper) {

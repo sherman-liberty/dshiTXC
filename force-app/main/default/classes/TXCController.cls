@@ -1,41 +1,13 @@
 public with sharing class TXCController {
 
     @AuraEnabled(cacheable=true)
-    public static TriageObjWrap getTriage(String recordId) {
-        system.debug('getTriage recordId: '+recordId);
-        // recordId = 'a1F3S0000004CFzUAM';
-        TriageObjWrap startObj;
-        List<Triage__c> triList = [SELECT Id, Gender__c, Date_of_Birth__c, Height__c, Weight__c, Systolic_Blood_Pressure__c, Diastolic_Blood_Pressure__c,
-                                    Temperature__c, Serum_Glucose__c, Respiratory_Rate__c, Pulse_Oximetry__c, Pulse__c
-                                    FROM Triage__c WHERE Id = :recordId LIMIT 1];
+    public static triageVitalsObj getVitalsObj(Triage__c tri) {
 
-        if (!triList.isEmpty()) {
-            Triage__c tri = triList[0];
-            startObj = new TriageObjWrap(tri.Gender__c, tri.Date_of_Birth__c, tri.Height__c, tri.Weight__c, tri.Systolic_Blood_Pressure__c, tri.Diastolic_Blood_Pressure__c, tri.Temperature__c, tri.Serum_Glucose__c, tri.Respiratory_Rate__c, tri.Pulse_Oximetry__c, tri.Pulse__c);
-
-            // tri.Gender__c, tri.Date_of_Birth__c, tri.Height__c, tri.Weight__c, tri.Systolic_Blood_Pressure__c, tri.Diastolic_Blood_Pressure__c, tri.Temperature__c, tri.Serum_Glucose__c, tri.Respiratory_Rate__c, tri.Pulse_Oximetry__c, tri.Pulse__c
-
-            // Gender__c, Date_of_Birth__c, Height__c, Weight__c, Systolic_Blood_Pressure__c, Diastolic_Blood_Pressure__c, Temperature__c, Serum_Glucose__c, Respiratory_Rate__c, Pulse_Oximetry__c, Pulse__c
-
-            // Gender__c
-            // Date_of_Birth__c
-            // Height__c
-            // Weight__c
-            // Systolic_Blood_Pressure__c
-            // Diastolic_Blood_Pressure__c
-            // Temperature__c
-            // Serum_Glucose__c
-            // Respiratory_Rate__c
-            // Pulse_Oximetry__c
-            // Pulse__c
-
-            // String gender, String date_of_Birth, String height, String weight, String systolic_Blood_Pressure, String diastolic_Blood_Pressure, String temperature, String serum_Glucose, String respiratory_Rate, String pulse_Oximetry, String pulse
-        }
-        system.debug('startObj: '+startObj);
+        triageVitalsObj startObj = new triageVitalsObj(tri.Gender__c, tri.Date_of_Birth__c, tri.Height__c, tri.Weight__c, tri.Systolic_Blood_Pressure__c, tri.Diastolic_Blood_Pressure__c, tri.Temperature__c, tri.Serum_Glucose__c, tri.Respiratory_Rate__c, tri.Pulse_Oximetry__c, tri.Pulse__c);
         return startObj;
     }
 
-    public class TriageObjWrap {
+    public class triageVitalsObj {
         @AuraEnabled
         public String gender {get; set;}
         @AuraEnabled
@@ -59,7 +31,7 @@ public with sharing class TXCController {
         @AuraEnabled
         public Decimal pulse {get; set;}
 
-        public TriageObjWrap(String gender, Date date_of_Birth, String height, Decimal weight, Decimal systolic_Blood_Pressure, Decimal diastolic_Blood_Pressure, Decimal temperature, Decimal serum_Glucose, Decimal respiratory_Rate, Decimal pulse_Oximetry, Decimal pulse) {
+        public triageVitalsObj(String gender, Date date_of_Birth, String height, Decimal weight, Decimal systolic_Blood_Pressure, Decimal diastolic_Blood_Pressure, Decimal temperature, Decimal serum_Glucose, Decimal respiratory_Rate, Decimal pulse_Oximetry, Decimal pulse) {
             this.gender = gender;
             this.date_of_Birth = date_of_Birth;
             this.height = height;
@@ -72,5 +44,14 @@ public with sharing class TXCController {
             this.pulse_Oximetry = pulse_Oximetry;
             this.pulse = pulse;
         }
+    }
+
+    @AuraEnabled
+    public static void updateTriageRecord (Triage__c triageRecord, String note) {
+
+        triageRecord.Triage_Status__c = 'TXC Complete';
+        triageRecord.TXC_Results__c = note;
+
+        update triageRecord;
     }
 }

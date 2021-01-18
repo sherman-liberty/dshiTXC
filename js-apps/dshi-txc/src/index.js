@@ -1,59 +1,57 @@
 import LCC from 'lightning-container';
-console.log('the index.js code is running 1!');
 
 window.addEventListener('load', (event) => {
-    console.log('page is fully loaded');
     let customElementRegistry = window.customElements;
     customElementRegistry.define("dshi-txl", dshiTXL);
-    customElementRegistry.define("dshi-txc", dshiTXC);
-});
+	customElementRegistry.define("dshi-txc", dshiTXC);
 
+	LCC.sendMessage({ name:"startIt", value: "start it up!" });
+});
 
 // Register for messages sent by hosting component
 LCC.addMessageHandler(function(message) {
 
-	console.log('addMessageHandler!', message);
-	let triObj = message.value;
-	console.log('triObj', triObj);
+	if (message.name == 'Vitals') {
+		let triObj = message.value;
+		let startObject = new Object();
 
-    // document.getElementById('messageFromLC').value = message.value;
-	// {"dob":"1950-03-08T05:00:00.000Z","gender":"M"}
-	// TODO parse the message to create the startObject from the vitals in the message
-	let genderVal = (triObj.gender == 'Male') ? 'M' : (triObj.gender == 'Female') ? 'F' : undefined;
+		// required fields
+		startObject['gender'] = (triObj.gender == 'Male' || triObj.gender == 'M') ? 'M' : (triObj.gender == 'Female' || triObj.gender == 'F') ? 'F' : undefined;
+		startObject['dob'] = new Date(triObj.date_of_Birth);
+		// vitals
+		objBuilder(startObject, 'height',triObj.height);
+		objBuilder(startObject, 'weight',triObj.weight);
+		objBuilder(startObject, 'systolicBloodPressure',triObj.systolic_Blood_Pressure);
+		objBuilder(startObject, 'diastolicBloodPressure',triObj.diastolic_Blood_Pressure);
+		objBuilder(startObject, 'temperature',triObj.temperature);
+		objBuilder(startObject, 'serumGlucose',triObj.serum_Glucose);
+		objBuilder(startObject, 'respiratoryRate',triObj.respiratory_Rate);
+		objBuilder(startObject, 'o2',triObj.pulse_Oximetry);
+		objBuilder(startObject, 'pulse',triObj.pulse);
 
-	let startObject = new Object();
-	startObject['gender'] = genderVal;
-	startObject['dob'] = new Date(triObj.date_of_Birth);
-	startObject['height'] = triObj.height;
-	startObject['weight'] = triObj.weight;
-	startObject['systolicBloodPressure'] = triObj.systolic_Blood_Pressure;
-	startObject['diastolicBloodPressure'] = triObj.diastolic_Blood_Pressure;
-	startObject['temperature'] = triObj.temperature;
-	startObject['serumGlucose'] = triObj.serum_Glucose;
-	startObject['respiratoryRate'] = triObj.respiratory_Rate;
-	startObject['o2'] = triObj.pulse_Oximetry;
-	startObject['pulse'] = triObj.pulse;
-
-    let x = document.getElementById("txc");
-    console.log('startObject: '+JSON.stringify(startObject));
-    x.start(startObject);
+		let x = document.getElementById("txc");
+		x.start(startObject);
+	}
 });
 
-// function send() {
-//     console.log('send function');
-//     var msg = document.getElementById('messageToLC').value;
-//     // Send message to hosting component
-//     LCC.sendMessage(msg);
-// }
-
-// document.getElementById("sendBtn").addEventListener("click", send);
+function objBuilder(obj, field, val) {
+	// TODO what about using if(val) {} ... test against various null/empty values
+	if (val == undefined) {
+		return obj;
+	} else {
+		obj[field] = val;
+		return obj;
+	}
+};
 
 document.getElementById("txc").addEventListener("complete", function(event) {
-    let dispositionObject = JSON.stringify(event.detail);
-    LCC.sendMessage(dispositionObject);
+	let dispositionObject = event.detail;
+	LCC.sendMessage({ name:"completeIt", value: dispositionObject });
 });
 
-document.getElementById('txc').addEventListener("abort", function (event) {console.log('it has been aborted')});
+document.getElementById('txc').addEventListener("abort", function (event) {
+	console.log('it has been aborted');
+});
 
 document.getElementById('txc').addEventListener("error", function(event) {
     var errorMsg = event.detail;

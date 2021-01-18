@@ -1,3 +1,8 @@
-<design:component >
-
+<design:component>
+    <design:attribute name="lccStaticResName" label="LCC Src Static Resource Name" default="dshi_txc" description="$Resource.&lt;staticResourceName&gt;./&lt;htmlPath&gt;" required="true" />
+    <design:attribute name="lccStaticResPath" label="LCC Src Static Resource Html Path" default="/index.html" description="$Resource.&lt;staticResourceName&gt;./&lt;htmlPath&gt;" required="true" />
+    <design:attribute name="cardTitle" label="Card Title" default="Patient Triage" description="Label of card component title" required="true" />
+    <design:attribute name="startButton" label="Start Button" default="Start Triage" description="Label of start button" required="true" />
+    <design:attribute name="txcTitle" label="TXC Title" default="TXC Triage" description="Label of TXC component title" required="true" />
+    <design:attribute name="triageMessage" label="Triage Message" default="Triage process complete." description="Success message" required="true" />
 </design:component>

@@ -1,50 +1,59 @@
-<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="TXCController">
 
-    <aura:attribute name="ShowModule" type="boolean" default="false" />
+    <aura:attribute name="triageRecord" type="Object" />
+    <aura:attribute name="recordLoadError" type="String" />
+    <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="Id, Gender__c, Date_of_Birth__c, Height__c, Weight__c, Systolic_Blood_Pressure__c, Diastolic_Blood_Pressure__c,
+                                    Temperature__c, Serum_Glucose__c, Respiratory_Rate__c, Pulse_Oximetry__c, Pulse__c,
+                                    TXC_Results__c, Triage_Status__c"
+        targetFields="{!v.triageRecord}" targetError="{!v.recordLoadError}" />
 
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+    <aura:attribute name="isSpinning" type="Boolean" />
+    <aura:attribute name="lccSrc" type="String" />
+    <!-- design attributes -->
+    <aura:attribute name="lccStaticResName" type="String" />
+    <aura:attribute name="lccStaticResPath" type="String" />
+    <aura:attribute name="triageMessage" type="String" />
+    <aura:attribute name="cardTitle" type="String" />
+    <aura:attribute name="startButton" type="String" />
+    <aura:attribute name="txcTitle" type="String" />
 
-    <aura:attribute name="messageFromEvent" type="String" />
-    <aura:handler name="cmpEvent" event="c:txcEvent" action="{!c.handleComponentEvent}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
-
-
-    <lightning:card title="Patient Triage" class="lcc">
+    <lightning:card title="{!v.cardTitle}" class="lcc">
         <aura:set attribute="actions">
-            <lightning:button variant="brand" label="Start Triage" name="callChild" onclick="{!c.callChild}" />
+            <aura:if isTrue="{!not(v.triageRecord.Triage_Status__c == 'TXC Complete' || v.triageRecord.Triage_Status__c == 'Assessment Complete')}">
+                <lightning:button variant="brand" label="Start Triage" name="startTriage" onclick="{!c.startTriage}" />
+            </aura:if>
         </aura:set>
-        <p class="successMsg slds-p-horizontal_small" >{!v.messageFromEvent}</p>
+        <aura:if isTrue="{!(v.triageRecord.Triage_Status__c == 'TXC Complete' || v.triageRecord.Triage_Status__c == 'Assessment Complete')}">
+            <p class="successMsg slds-p-horizontal_small">{!v.triageMessage}</p>
+        </aura:if>
     </lightning:card>
 
-    <aura:if isTrue="{!v.ShowModule}">
-        <div class="demo-only" >
+    <aura:if isTrue="{!v.showModal}">
+        <div>
             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                 <div class="slds-modal__container">
+                    <!-- modal header -->
                     <header class="slds-modal__header">
-
-                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }"
+                        <lightning:buttonIcon iconName="utility:close" variant="bare-inverse" onclick="{!c.hideMe}"
                             alternativeText="Close" class="slds-modal__close" />
-
-                        <!-- <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
-                            You Can add Button Icon Here if you want
-                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close" />
-                            </svg>
-                            <span class="slds-assistive-text">Close</span>
-                        </button> -->
-
-                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">TXC Triage</h2>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.txcTitle}</h2>
                     </header>
+                    <!-- modal body -->
                     <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                        <c:dshiTXC aura:id="childComp" recordId="{!v.recordId}" />
+                        <!-- child component, lcc host -->
+                        <c:dshiTXC aura:id="childComp" showModal="{!v.showModal}" isSpinning="{!v.isSpinning}" triageRecord="{!v.triageRecord}" lccSrc="{!v.lccSrc}" />
                     </div>
+                    <!-- modal footer -->
                     <footer class="slds-modal__footer">
-                        <lightning:button variant="Neutral" label="Cancel" onclick="{! c.HideMe }" />
+                        <lightning:button variant="Neutral" label="Cancel" onclick="{!c.hideMe}" />
                     </footer>
                 </div>
             </section>
             <div class="slds-backdrop slds-backdrop_open"></div>
         </div>
-
     </aura:if>
 </aura:component>
